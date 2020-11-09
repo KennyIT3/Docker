@@ -1,2 +1,2 @@
 # Docker
-Test environment for Docker 
+Dev environment for Docker 
