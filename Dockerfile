@@ -1,10 +1,17 @@
-FROM library/ubuntu:14.04
+#FROM library/ubuntu:14.04
+#These are run command for Ubuntu image
+# RUN apt-get update -y
+# RUN apt-get dist-upgrade -y
+# RUN apt-get install python3-pip -y
+# RUN pip3 install flask
 
-RUN apt-get update -y
-RUN apt-get dist-upgrade -y
-RUN apt-get install python3-pip -y
-RUN pip3 install flask
-
+FROM geerlingguy/docker-centos8-ansible
+ 
+RUN yum update -y
+RUN yum upgrade -y
+RUN yum install python3-pip -y
+RUN pip3 install flask 
+   
 ENV HOME /home
 
 ADD ./ /opt/webapp/
