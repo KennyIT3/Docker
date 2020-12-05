@@ -2,13 +2,13 @@ Vagrant.configure("2") do |config|
   ansible=[
     {
       :hostname => "node1",
-      :box => "geerlingguy/centos7",
+      :box => "geerlingguy/centos8",
       :ip => "192.168.56.10",
       :ssh_port => '2224'
     },
     {
       :hostname => "node2",
-      :box => "geerlingguy/centos7",
+      :box => "geerlingguy/centos8",
       :ip => "192.168.56.11",
       :ssh_port => '2225'
     }
