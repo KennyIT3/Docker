@@ -3,7 +3,8 @@ pipeline {
     stages {
         stage('Build Repo') { 
             steps {
-                sh "git clone https://github.com/KennyIT3/Docker.git" 
+                //sh "git clone https://github.com/KennyIT3/Docker.git" 
+                sh "mvn clean"
             }
         }
         stage('Testing Repo') { 
