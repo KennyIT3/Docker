@@ -1,0 +1,20 @@
+#Pulls the container image
+FROM <IMAGE>
+
+#Runs a command in the container
+RUN 
+
+#Setups the enviromental variables in Container
+ENV
+
+#Setups a entry commnad that runs when the container is runned
+ENTRYPOINT 
+
+#Runs a command when the container is runned 
+CMD
+
+#Opens container in this Directory
+WORKDIR /opt
+
+#Expose container port
+EXPOSE 80
