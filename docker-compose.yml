@@ -18,7 +18,6 @@ services:
       - mysql_network
     depends_on:
       - mysql
-
   mysql:
     container_name: mysql
     image: mysql:5.7
@@ -29,9 +28,21 @@ services:
     networks:
       - mysql_network
 
+  web:
+   # Builds Web service from Dockerfile
+      build: .
+      command: python manage.py runserver 0.0.0.0:8000
+      volumes:
+         - python:/code
+      ports:
+         - "8000:8000"
+      depends_on:
+        - mysql
+
 volumes:
   ghost-volume:
   mysql-volume:
+  python:
 
 networks:
   ghost_network:
