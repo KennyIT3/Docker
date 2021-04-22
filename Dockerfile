@@ -7,17 +7,17 @@
 
 FROM geerlingguy/docker-centos7-ansible:latest
 RUN yum update -y
-RUN yum upgrade -y
 RUN yum install python3-pip -y
 RUN pip3 install flask 
-   
 ENV HOME /home
 
-ADD ./ /opt/webapp/
+#ADD ./   /opt/python/
 
-WORKDIR /opt/webapp
+COPY  ./* /opt/Docker/
+
+WORKDIR /opt/Docker
 EXPOSE 5000
 
-ENTRYPOINT ["python3"]
+#ENTRYPOINT ["python3"]
 
-CMD ["app.py"]
+#CMD ["app.py"]
