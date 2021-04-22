@@ -1,0 +1,51 @@
+# .bashrc
+
+# User specific aliases and functions
+
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+alias l.='ls -d .* --color=auto'
+alias ll='ls -l --color=auto'
+alias ls='ls --color=auto'
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias yp='yum -y update'
+alias s='source ~/.bashrc'
+alias p='python3.7'
+alias P='python3.7'
+alias py='cd /Python_Scipts-Automating-Sysadmin/Scripts'
+#alias dr='docker rmi $(docker ps -aq)'
+alias dc='docker container ls'
+alias di='docker images -a'
+alias d='cd /Docker'
+alias dd='docker container prune'
+alias dr='docker rmi $(docker ps -aq)'
+alias dri='docker rmi  $(docker images -q)'
+alias sd='docker stop $(docker ps -a -q)'
+alias dp='docker ps -a'
+alias ds='docker container stop $(docker container ls)'
+alias v='vim'
+alias a='cd /Ansible_Playbooks'
+alias s='source /root/.bashrc'
+alias li='cd /LinuxScripts/Scripts'
+alias gp='git push'
+alias gd='git diff'
+alias ga='git add .'
+alias gc='git commit -m "Update"'
+alias uc='git reset --hard HEAD^'
+alias t='cd /Terraform'
+alias ta='terraform state list'
+alias ts='terraform state show'
+alias ta='terraform --auto-approve'
+alias tf='terraform fmt'
+alias ti='terraform init'
+alias tv='terraform validate'
+alias tp='terraform plan'
+alias to='terraform output'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
