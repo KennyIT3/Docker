@@ -1,4 +1,4 @@
-#FROM geerlingguy/docker-centos7-ansible:latest
+# Centos Image With Ansible and Docker
 FROM ansible/centos7-ansible:latest
 USER root
 RUN yum update -y
