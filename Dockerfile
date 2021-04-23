@@ -2,10 +2,17 @@
 FROM ansible/centos7-ansible:latest
 USER root
 RUN yum update -y
-RUN yum install python3-pip -y
-RUN pip3 install flask 
-RUN mkdir /opt/Docker
-ENV HOME /home
+
+RUN yum install python3-pip -y && \
+pip3 install flask && \
+yum install vim -y && \
+yum install mlocate -y
+
+
+RUN mkdir /opt/Docker 
+RUN /bin/bash -c "updatedb"
+
+#ENV 
 
 ADD ./.bashrc   /root/*
 
@@ -14,12 +21,12 @@ COPY  ./* /opt/Docker/
 WORKDIR /opt/Docker
 EXPOSE 5000
 
-#ENTRYPOINT ["/opt/Docker/installCompose.sh"]
 RUN ["/opt/Docker/installCompose.sh"]
 
 
 RUN ["ls"]
 
-CMD ["source /root/.bashrc"]
-
-#CMD ["ll"]
+RUN /bin/bash -c "cp .bashrc /root/"
+RUN /bin/bash -c "source /root/.bashrc"
+#ENTRYPOINT ["top"]
+#CMD ["-U root"]
