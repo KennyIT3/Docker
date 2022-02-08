@@ -114,7 +114,7 @@
       notify: "restart {{stack_name_base}} stack"
 
     - name: Alter firewalld to remove forwarder to VM if present
-      shell: 'firewall-cmd --permanent --zone=public --remove-forward-port=port=5044:proto=tcp:toport=5044:toaddr=192.168.10.15 && firewall-cmd --reload'
+      shell: 'firewall-cmd --permanent --zone=public --remove-forward-port=port=5044:proto=tcp:toport=5044:toaddr=192.168.15.3 && firewall-cmd --reload'
 
     - name: Ensure firewalld allows 5044/tcp
       firewalld:
