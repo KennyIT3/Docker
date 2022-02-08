@@ -5,8 +5,8 @@ services:
     image: registry.localhost:5000/mediawiki:latest
     #environment:
     extra_hosts:
-      - "wiki.rocusnetworks.local:172.18.0.1"
-      - "wiki-parse.rocusnetworks.local:172.18.0.1"
+      - "wiki.test.local:192.18.0.1"
+      - "wiki-parse.test.local:192.18.0.1"
     ports:
       - 8180:80
     volumes:
@@ -26,7 +26,7 @@ services:
   parsoid:
     image: registry.localhost:5000/parsoid:latest
     extra_hosts:
-      - "wiki.rocusnetworks.local:172.18.0.1"
+      - "wiki.test.local:192.18.0.1"
     ports:
       - 8181:8000
     deploy:
@@ -38,7 +38,7 @@ services:
   redis:
     image: registry.localhost:5000/redis:latest
     extra_hosts:
-      - "wiki.rocusnetworks.local:172.18.0.1"
+      - "wiki.test.local:192.18.0.1"
     ports:
       - 6379:6379
     deploy:
@@ -60,5 +60,5 @@ volumes:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=10.51.1.18,rw,noatime,nfsvers=3,nolock,bg,intr,tcp,actimeo=1800
-      device: "10.51.1.18:/volume1/docker/mediawiki"
+      o: addr=10.1.1.12,rw,noatime,nfsvers=3,nolock,bg,intr,tcp,actimeo=1800
+      device: "10.1.1.13:/volume1/docker/mediawiki"
