@@ -1,0 +1,136 @@
+---
+- name: Change stack name if necessary
+  set_fact:
+    stack_name: "{{stack_name_base}}"
+
+- name: Create {{stack_title}} Docker stack directories
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: root
+    group: config
+    mode: '0775'
+  with_items:
+  - "{{docker_dir}}/{{stack_name}}"
+  - "{{docker_dir}}/{{stack_name}}/logstash_configs"
+  - "{{docker_dir}}/{{stack_name}}/logstash_configs/support"
+  - "{{docker_dir}}/store/{{stack_name}}"
+  - "{{logdata_log_path}}/palogs"
+
+- name: Create {{stack_title}} Docker stack store directories
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: root
+    group: config
+    mode: '0777'
+  with_items:
+  - "{{docker_dir}}/store/{{stack_name}}/data"
+  - "{{docker_dir}}/store/{{stack_name}}/sincedb"
+
+- name: Generate {{stack_title}} Docker stack file
+  template:
+    src: "{{role_path}}/templates/stack.yml.j2"
+    dest: "{{docker_dir}}/{{stack_name}}/stack.yml"
+    owner: root
+    group: config
+    mode: '0664'
+  notify: "restart {{stack_name_base}} stack"
+
+- name: Add static {{stack_title}} configuration files
+  copy:
+    src: "{{role_path}}/files/{{item}}"
+    dest: "{{docker_dir}}/{{stack_name}}/{{item}}"
+    owner: root
+    group: config
+    mode: '0664'
+  with_items:
+  - "logstash.yml"
+  - "pipelines.yml"
+  notify: "restart {{stack_name_base}} stack"
+
+- name: Generate {{stack_title}} jvm configuration
+  template:
+    src: "{{role_path}}/templates/jvm.options.j2"
+    dest: "{{docker_dir}}/{{stack_name}}/jvm.options"
+    owner: root
+    group: config
+    mode: '0664'
+  notify: "restart {{stack_name_base}} stack"
+
+- name: Generate {{stack_title}} panos configuration files
+  template:
+    src: "{{role_path}}/templates/logstash_configs/{{item}}.j2"
+    dest: "{{docker_dir}}/{{stack_name}}/logstash_configs/{{item}}"
+    owner: root
+    group: config
+    mode: '0664'
+  with_items:
+  - "6000-pansysconf-input.conf"
+  - "6001-pansysconf-filter.conf"
+  - "6002-pansysconf-output.conf"
+  notify: "restart {{stack_name_base}} stack"
+
+- name: Generate {{stack_title}} mimecast configuration files
+  when: '"mimecast-logging" in group_names'
+  template:
+    src: "{{role_path}}/templates/logstash_configs/{{item}}.j2"
+    dest: "{{docker_dir}}/{{stack_name}}/logstash_configs/{{item}}"
+    owner: root
+    group: config
+    mode: '0664'
+  with_items:
+    - "8000-mimecast-input.conf"
+    - "8001-mimecast-filter.conf"
+    - "8002-mimecast-output.conf"
+  notify: "restart {{stack_name_base}} stack"
+
+- name: Copy {{stack_title}} mimecast client mapping
+  when: '"mimecast-logging" in group_names'
+  copy:
+    src: "{{role_path}}/files/support/client_name_map.json"
+    dest: "{{docker_dir}}/{{stack_name}}/logstash_configs/support/client_name_map.json"
+    owner: root
+    group: config
+    mode: '0664'
+#  this is regularly re-read and doesn't need to restart the stack
+#  notify: "restart {{stack_name_base}} stack"
+
+
+- name: Configure winlogbeat for host
+  when: '"winlogbeat_7" in group_names'
+  block:
+    - name: Generate {{stack_title}} winlogbeat configuration files
+      template:
+        src: "{{role_path}}/templates/logstash_configs/{{item}}.j2"
+        dest: "{{docker_dir}}/{{stack_name}}/logstash_configs/{{item}}"
+        owner: root
+        group: config
+        mode: '0664'
+      with_items:
+        - "4000-winlogbeat-input.conf"
+        - "4001-winlogbeat-filter.conf"
+        - "4002-winlogbeat-output.conf"
+      notify: "restart {{stack_name_base}} stack"
+
+    - name: Alter firewalld to remove forwarder to VM if present
+      shell: 'firewall-cmd --permanent --zone=public --remove-forward-port=port=5044:proto=tcp:toport=5044:toaddr=192.168.10.15 && firewall-cmd --reload'
+
+    - name: Ensure firewalld allows 5044/tcp
+      firewalld:
+        zone: public
+        port: 5044/tcp
+        permanent: true
+        immediate: true
+        state: enabled
+
+# make sure the restart handler runs if necessary
+- meta: flush_handlers
+
+- name: Deploy {{stack_title}} from compose file
+  docker_stack:
+    state: present
+    with_registry_auth: yes
+    name: "{{stack_name}}"
+    compose:
+      - "{{docker_dir}}/{{stack_name}}/stack.yml"

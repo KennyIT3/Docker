@@ -1,0 +1,64 @@
+version: '3.6'
+
+services:
+  mediawiki:
+    image: registry.localhost:5000/mediawiki:latest
+    #environment:
+    extra_hosts:
+      - "wiki.rocusnetworks.local:172.18.0.1"
+      - "wiki-parse.rocusnetworks.local:172.18.0.1"
+    ports:
+      - 8180:80
+    volumes:
+      - mediawiki_nfs:/srv/mediawiki
+    command:
+      - /bin/bash /srv/mediawiki/init.sh
+      - '&&'
+      - docker-php-entrypoint
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+    secrets:
+      - mwiki_db_php
+
+  parsoid:
+    image: registry.localhost:5000/parsoid:latest
+    extra_hosts:
+      - "wiki.rocusnetworks.local:172.18.0.1"
+    ports:
+      - 8181:8000
+    deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints: [node.role == worker]
+
+  redis:
+    image: registry.localhost:5000/redis:latest
+    extra_hosts:
+      - "wiki.rocusnetworks.local:172.18.0.1"
+    ports:
+      - 6379:6379
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+      resources:
+        limits:
+          memory: 50M
+     
+
+secrets:
+  mwiki_db_php:
+    external: true
+
+volumes:
+  mediawiki_nfs:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.51.1.18,rw,noatime,nfsvers=3,nolock,bg,intr,tcp,actimeo=1800
+      device: "10.51.1.18:/volume1/docker/mediawiki"
